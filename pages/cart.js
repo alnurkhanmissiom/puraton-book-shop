@@ -6,6 +6,8 @@ import Layout from '../components/Layout';
 import { Store } from '../utils/store';
 import { useRouter } from 'next/router';
 import dynamic from 'next/dynamic';
+import { toast } from 'react-toastify';
+import axios from 'axios';
 
 function CartScreen() {
   const router = useRouter();
@@ -16,9 +18,14 @@ function CartScreen() {
   const removeItemHandler = (item) => {
     dispatch({ type: 'CART_REMOVE_ITEM', payload: item });
   };
-  const updateCartHandaler = (item, qty) => {
+  const updateCartHandaler = async (item, qty) => {
     const quantity = Number(qty);
+    const { data } = await axios.get(`/api/products/${item._id}`);
+    if (data.countInStock < quantity) {
+      return toast.error('Sorry. Product is out of stock');
+    }
     dispatch({ type: 'CART_ADD_ITEM', payload: { ...item, quantity } });
+    toast.success('Product updated to cart');
   };
   return (
     <Layout title="Shopping Cart">
@@ -82,7 +89,7 @@ function CartScreen() {
               </tbody>
             </table>
           </div>
-          <div className="card p-5">
+          <div className="card p-5 h-fit">
             <ul>
               <li>
                 <div className="pb-3">
