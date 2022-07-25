@@ -2,12 +2,12 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useContext } from 'react';
 import Layout from '../../components/Layout';
-
+import axios from 'axios';
 import Image from 'next/image';
 import { Store } from '../../utils/store';
 import Product from '../../models/Product';
 import db from '../../utils/db';
-import axios from 'axios';
+
 import { toast } from 'react-toastify';
 export default function ProductScreen(props) {
   const { product } = props;
@@ -22,7 +22,6 @@ export default function ProductScreen(props) {
     const existItem = state.cart.cartItems.find((x) => x.slug === product.slug);
     const quantity = existItem ? existItem.quantity + 1 : 1;
     const { data } = await axios.get(`/api/products/${product._id}`);
-
     if (data.countInStock < quantity) {
       return toast.error('sorry. Product is out of stock');
     }
@@ -44,31 +43,37 @@ export default function ProductScreen(props) {
             layout="responsive"
           ></Image>
         </div>
+
+        <ul>
+          <li>
+            <h1 className="text-lg">{product.name}</h1>
+          </li>
+          <li>Category: {product.catagory}</li>
+          <li>Brand:{product.brand}</li>
+          <li>
+            {product.rating} of {product.numReviews} reviews
+          </li>
+          <li>Description: {product.description}</li>
+        </ul>
         <div>
-          <ul>
-            <li>
-              <h1 className="text-lg">{product.name}</h1>
-            </li>
-            <li>Category: {product.category}</li>
-            <li>Brand:{product.brand}</li>
-            <li>
-              {product.rating} of {product.numReviews} reviews
-            </li>
-            <li>Description: {product.description}</li>
-          </ul>
-        </div>
-        <div className="card p-5 h-fit">
-          <div className="mb-2 flex justify-between">
-            <div>Price</div>
-            <div>${product.price}</div>
+          <div className="card p-5">
+            <div className="mb-2 flex justify-between">
+              <div>Price</div>
+              <div>${product.price}</div>
+            </div>
+            <div className="mb-2 flex justify-between">
+              <div>Status</div>
+              {product.countInStock > 0 ? 'In stock' : 'Unavilable'}
+            </div>
+            <div>
+              <button
+                className="primary-button w-full"
+                onClick={addToCartHandler}
+              >
+                Add to Cart
+              </button>
+            </div>
           </div>
-          <div className="mb-2 flex justify-between">
-            <div>Status</div>
-            {product.countInStock > 0 ? 'In stock' : 'Unavilable'}
-          </div>
-          <button className="primary-button w-full" onClick={addToCartHandler}>
-            Add to Cart
-          </button>
         </div>
       </div>
     </Layout>

@@ -4,8 +4,9 @@ import ProductItem from '../components/ProductItem';
 import Product from '../models/Product';
 import db from '../utils/db';
 import { Store } from '../utils/store';
-import axios from 'axios';
+
 import { toast } from 'react-toastify';
+import axios from 'axios';
 
 export default function Home({ products }) {
   const { state, dispatch } = useContext(Store);
