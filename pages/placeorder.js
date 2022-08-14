@@ -2,7 +2,7 @@ import axios from 'axios';
 import Cookies from 'js-cookie';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Router, useRouter } from 'next/router';
+import { useRouter } from 'next/router';
 import React, { useContext, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import CheckoutWizard from '../components/CheckoutWizard';
@@ -25,7 +25,7 @@ export default function PlaceOrderScreen() {
   const router = useRouter();
   useEffect(() => {
     if (!paymentMethod) {
-      Router.push('/payment');
+      router.push('/payment');
     }
   }, [paymentMethod, router]);
   const [loading, setLoading] = useState(false);
@@ -33,7 +33,7 @@ export default function PlaceOrderScreen() {
   const placeOrderHandler = async () => {
     try {
       setLoading(true);
-      const { data } = await axios.post('/api/order', {
+      const { data } = await axios.post('/api/orders', {
         orderItems: cartItems,
         shippingAddress,
         paymentMethod,
@@ -44,7 +44,13 @@ export default function PlaceOrderScreen() {
       });
       setLoading(false);
       dispatch({ type: 'CART_CLEAR_ITEMS' });
-      Cookies.set('cart', JSON.stringify({ ...cart, cartItems: [] }));
+      Cookies.set(
+        'cart',
+        JSON.stringify({
+          ...cart,
+          cartItems: [],
+        })
+      );
       router.push(`/order/${data._id}`);
     } catch (err) {
       setLoading(false);
